@@ -32,23 +32,30 @@ static int callback(void *data, int argc, char ** argv, char ** columns)
     return 0;
 }
 
-void query(const connection & _conn,
-           const std::string & _query)
+static int c_callback(void *data, int _argc, char ** _argv, char ** _columns)
+{
+	query_result * result = reinterpret_cast<query_result *>(data);
+	return result->callback(_argc, _argv, _columns);
+}
+
+query_result query(const connection & _conn,
+                   const std::string & _query)
 {
     auto db = _conn.db_handle;
     if (db != nullptr)
     {
         char *err = nullptr;
-        std::shared_ptr<query_result> result;
-        const char *data = "callback called";
-        const auto ret = sqlite3_exec(db, _query.c_str(), callback, (void *)data, &err);
+        query_result result;
+        const auto ret = sqlite3_exec(db, _query.c_str(), c_callback, &result, &err);
         if (SQLITE_OK != ret)
         {
             std::cout << "Error while querying : "
                       << sqlite3_errmsg(db) << std::endl;
             sqlite3_free(err);
         }
+		return result;
     }
+	return query_result();
 }
 
 query_result::query_result(int _count,
@@ -57,11 +64,41 @@ query_result::query_result(int _count,
 {
     for (int i = 0; i < _count; ++i)
     {
-        result[_columns[i]] = _argv[i] ? _argv[i] : "NULL";
+        //result[_columns[i]] = _argv[i] ? _argv[i] : "NULL";
     }
 }
 
 std::string query_result::operator[](const std::string _key)
 {
-    return result.at(_key);
+    return std::string();
+}
+
+int query_result::callback(int _argc,
+                           char ** _argv,
+                           char ** _colnames)
+{
+	std::cout << "query_result::callback called with parameters: "
+		<< _argc << std::endl;
+	std::vector<std::string> row;
+    for (int i = 0; i < _argc; ++i)
+    {
+		std::cout << _colnames[i] << " : " << _argv[i] << std::endl;
+		row.push_back(_argv[i] ? _argv[i] : "NULL");
+    }
+	data.push_back(row);
+    return 0;
+}
+
+std::ostream& operator<<(std::ostream& _os,
+                         const query_result & _result)
+{
+    for (const auto& row : _result.data)
+    {
+		for (const auto& field : row)
+		{
+			std::cout << field << " | ";
+		}
+		std::cout << std::endl;
+    }
+    return _os;
 }

@@ -9,5 +9,7 @@
 int main()
 {
 	auto& conn = connection::connect("data.dblite");
-	query(conn, "SELECT * FROM workers WHERE worker_id = 1");
+	auto result = query(conn, "SELECT * FROM position");
+
+	std::cout << result << std::endl;
 }
