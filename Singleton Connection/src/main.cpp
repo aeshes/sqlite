@@ -8,6 +8,6 @@
 
 int main()
 {
-	connection *conn = connection::connect("data.dblite");
-	query(*conn, "SELECT * FROM workers WHERE worker_id = 1");
+	auto& conn = connection::connect("data.dblite");
+	query(conn, "SELECT * FROM workers WHERE worker_id = 1");
 }
