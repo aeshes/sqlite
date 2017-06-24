@@ -12,6 +12,7 @@ class worker
 public:
 	virtual ~worker() = default;
 	virtual void get_by_id(int _id) = 0;
+	virtual int experience(int _id) = 0;
 
 protected:
 	virtual int callback(int _argc,
@@ -29,6 +30,7 @@ public:
 	employee() = default;
 	employee(int _id);
 	void get_by_id(int _id) override;
+	int experience(int _id) override;
 
 private:
 	int callback(int _argc,

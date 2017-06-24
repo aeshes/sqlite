@@ -16,6 +16,11 @@ int main()
 
 	employee e;
 	e.get_by_id(1);
+	std::cout << "Experience: " << e.experience(2) << std::endl;
 
-	employee d(1);
+	request req;
+	req.execute("SELECT * FROM workers WHERE worker_id = 1");
+	std::cout << req.value(0) << std::endl;
+	std::cout << req.value(1) << std::endl;
+	std::cout << req.value(2) << std::endl;
 }

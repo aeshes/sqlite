@@ -87,3 +87,46 @@ std::string query_result::operator[](const std::string _key) const
 {
     return result[0][fields_and_indexes.at(_key)];
 }
+
+static int request_callback(void * _data,
+	int _argc,
+	char ** _argv,
+	char ** _colnames)
+{
+	request * q = reinterpret_cast<request *>(_data);
+	return q->callback(_argc, _argv, _colnames);
+}
+
+void request::execute(const std::string & _sql)
+{
+	char * err = nullptr;
+	auto & db = connection::connect();
+
+	const auto ret = sqlite3_exec(db.get(), _sql.c_str(), request_callback, this, &err);
+	if (SQLITE_OK != ret)
+	{
+		std::cout << sqlite3_errmsg(db.get()) << std::endl;
+		sqlite3_free(err);
+	}
+}
+
+void request::check_index(std::size_t _index, const std::string & _msg)
+{
+	if (_index >= result.size())
+		throw std::out_of_range(_msg);
+}
+
+std::string request::value(std::size_t _index)
+{
+	check_index(_index, "query::value : index out of range");
+	return result[_index];
+}
+
+int request::callback(int _argc,
+	char ** _argv,
+	char ** _colnames)
+{
+	for (int i = 0; i < _argc; ++i)
+		result.emplace_back(_argv[i] ? _argv[i] : "NULL");
+	return 0;
+}

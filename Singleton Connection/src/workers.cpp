@@ -12,8 +12,11 @@ static int worker_callback(void * param,
 employee::employee(int _id)
 {
 	std::string sql = "SELECT * FROM workers WHERE worker_id = " + std::to_string(_id);
-	auto result = query(connection::connect("data.dblite"), sql);
+	auto result = query(connection::connect(), sql);
 	std::cout << result << std::endl;
+
+	firstname = result["firstname"];
+	lastname  = result["lastname"];
 }
 
 void employee::get_by_id(int _id)
@@ -26,6 +29,13 @@ void employee::get_by_id(int _id)
 	{
 		std::cout << "Error in employee::get_by_id: " << sqlite3_errmsg(db.get()) << std::endl;
 	}
+}
+
+int employee::experience(int _id)
+{
+	auto& db = connection::connect();
+	request req("SELECT DATE('now') - (SELECT hire_date FROM workers where worker_id = " + std::to_string(_id) + ")");
+	return std::stoi(req.value(0));
 }
 
 int employee::callback(int _argc,

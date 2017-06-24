@@ -13,15 +13,13 @@
 
 class connection;
 class query_result;
+class request;
+
+#define DEFAULT_DB_NAME "data.dblite"
 
 query_result query(const connection & _conn,
                    const std::string & _query);
 
-template <typename T, typename Del = std::default_delete<T>>
-inline auto raii_ptr(T* t, Del&& del = std::default_delete<T>)
-{
-	return std::unique_ptr<T, Del> {t, del};
-}
 
 class connection
 {
@@ -29,13 +27,13 @@ class connection
                               const std::string & _query);
     using handle = sqlite3 *;
 public:
-    static connection & connect(const std::string & _dbfile);
+    static connection & connect(const std::string & _dbfile = DEFAULT_DB_NAME);
 	static handle get() { return db_handle; }
 
 private:
     connection(const std::string & _dbfile);
-    connection(const connection & _conn)             = default;
-    connection & operator=(const connection & _conn) = default;
+    connection(const connection & _conn)             = delete;
+    connection & operator=(const connection & _conn) = delete;
 
     static handle db_handle;
 };
@@ -54,6 +52,27 @@ public:
 private:
     std::vector<std::vector<std::string>> result;
     std::map<std::string, std::size_t> fields_and_indexes;
+};
+
+class request
+{
+	friend int request_callback(void *, int, char **, char **);
+
+public:
+	request() = default;
+	request(const std::string & _sql)
+		: sql{ _sql } { execute(_sql); }
+	void execute(const std::string & _sql);
+	std::string value(std::size_t _index);
+
+private:
+	std::string sql;
+	std::vector<std::string> result;
+
+	void check_index(std::size_t _index, const std::string & _msg);
+	int callback(int _argc,
+		char ** _argv,
+		char ** _colnames);
 };
 
 #endif
