@@ -45,6 +45,7 @@ public:
     friend std::ostream& operator<<(std::ostream& _os,
                                     const query_result & _result);
 	std::string operator[](const std::string _key) const;
+	std::string value(std::size_t _column);
 
     int callback(int _argc,
                  char ** _argv,
@@ -52,6 +53,7 @@ public:
 private:
     std::vector<std::vector<std::string>> result;
     std::map<std::string, std::size_t> fields_and_indexes;
+	std::size_t current_row = 0;
 };
 
 class request

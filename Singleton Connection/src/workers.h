@@ -8,16 +8,13 @@
 
 class worker
 {
-	friend int worker_callback(void *, int, char **, char **);
 public:
 	virtual ~worker() = default;
-	virtual void get_by_id(int _id) = 0;
-	virtual int experience(int _id) = 0;
+	virtual int work_experience() = 0;
+	virtual double salary()       = 0;
 
 protected:
-	virtual int callback(int _argc,
-		char ** _argv,
-		char ** _colnames) = 0;
+	int         id;
 	std::string firstname;
 	std::string lastname;
 	std::time_t hire_date;
@@ -28,14 +25,9 @@ class employee : public worker
 {
 public:
 	employee() = default;
-	employee(int _id);
-	void get_by_id(int _id) override;
-	int experience(int _id) override;
-
-private:
-	int callback(int _argc,
-		char ** _argv,
-		char ** _colnames) override;
+	explicit employee(int _id);
+	int work_experience() override;
+	double salary()       override;
 };
 
 #endif
