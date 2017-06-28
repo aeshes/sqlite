@@ -5,6 +5,7 @@
 #include <ctime>
 #include <memory>
 #include <set>
+#include <algorithm>
 
 #include "db.h"
 
@@ -14,6 +15,7 @@ public:
 	virtual ~worker() = default;
 	virtual int work_experience() = 0;
 	virtual double salary()       = 0;
+	int get_id() { return id; }
 
 protected:
 	int         id;
@@ -35,23 +37,31 @@ public:
 class head : public worker
 {
 // Abstract class for all workers that can have subordinates
+public:
+	void debug() noexcept;
 protected:
     int work_experience() noexcept override;
-	double calc_salary(double _exp_coeff, double _sub_coeff, double _extra_pay_limit) noexcept;
+	double calc_salary(double _exp_coeff, double _extra_pay_limit) noexcept;
 
 	using pointer_type = std::shared_ptr<worker>;
 	using storage_type = std::set<pointer_type>;
 
-	storage_type subs;
+	storage_type employees;
 };
 
-class manager : public worker
+class manager : public head
 {
 public:
-    manager() noexcept = default;
+    manager() = default;
     explicit manager(int _id) noexcept;
     int work_experience() noexcept override;
     double salary()       noexcept override;
+
+private:
+	static constexpr double exp_coeff = 0.03;
+	static constexpr double extra_pay_limit = 0.4;
+	static constexpr double emp_coeff = 0.005;
+
 };
 
 #endif

@@ -19,10 +19,6 @@ int main()
 	std::cout << req.value(1) << std::endl;
 	std::cout << req.value(2) << std::endl;
 
-	request r("SELECT * FROM workers");
-	while (r.has_next())
-	{
-		std::cout << r.value(1) << std::endl;
-		r.next_row();
-	}
+	manager m(5);
+	m.debug();
 }
