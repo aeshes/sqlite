@@ -9,17 +9,20 @@
 
 int main()
 {
-	auto& conn = connection::connect("data.dblite");
-	auto result = query(conn, "SELECT * FROM workers");
-
-	std::cout << result << std::endl;
-
 	employee e(2);
-	std::cout << "Experience: " << e.work_experience() << std::endl;
+	std::cout << "Experience: " << e.work_experience()
+              << ", Salary: "   << e.salary() << std::endl;
 
 	request req;
 	req.execute("SELECT * FROM workers WHERE worker_id = 1");
 	std::cout << req.value(0) << std::endl;
 	std::cout << req.value(1) << std::endl;
 	std::cout << req.value(2) << std::endl;
+
+	request r("SELECT * FROM workers");
+	while (r.has_next())
+	{
+		std::cout << r.value(1) << std::endl;
+		r.next_row();
+	}
 }

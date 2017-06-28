@@ -15,7 +15,7 @@ class connection;
 class query_result;
 class request;
 
-#define DEFAULT_DB_NAME "data.dblite"
+const std::string DEFAULT_DB_NAME("data.dblite");
 
 query_result query(const connection & _conn,
                    const std::string & _query);
@@ -61,15 +61,24 @@ class request
 	friend int request_callback(void *, int, char **, char **);
 
 public:
-	request() = default;
-	request(const std::string & _sql)
-		: sql{ _sql } { execute(_sql); }
-	void execute(const std::string & _sql);
+	request() noexcept
+		: row_pointer{ 0 } {};
+	request(const std::string & _sql) noexcept
+		: sql{ _sql }, row_pointer{ 0 } { execute(_sql); }
+
+	void execute(const std::string & _sql) noexcept;
 	std::string value(std::size_t _index);
+	bool has_next() noexcept;
+	void next_row() noexcept;
+	void reset()    noexcept;
 
 private:
 	std::string sql;
-	std::vector<std::string> result;
+
+	using row_type = std::vector<std::string>;
+
+	std::vector<row_type> table;
+	std::size_t row_pointer;
 
 	void check_index(std::size_t _index, const std::string & _msg);
 	int callback(int _argc,

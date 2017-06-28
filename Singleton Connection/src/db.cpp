@@ -97,7 +97,7 @@ static int request_callback(void * _data,
 	return q->callback(_argc, _argv, _colnames);
 }
 
-void request::execute(const std::string & _sql)
+void request::execute(const std::string & _sql) noexcept
 {
 	char * err = nullptr;
 	auto & db = connection::connect();
@@ -110,23 +110,40 @@ void request::execute(const std::string & _sql)
 	}
 }
 
+bool request::has_next() noexcept
+{
+	return row_pointer < table.size();
+}
+
+void request::next_row() noexcept
+{
+    ++row_pointer;
+}
+
+void request::reset() noexcept
+{
+	row_pointer = 0;
+}
+
 void request::check_index(std::size_t _index, const std::string & _msg)
 {
-	if (_index >= result.size())
+	if (_index >= table[row_pointer].size())
 		throw std::out_of_range(_msg);
 }
 
 std::string request::value(std::size_t _index)
 {
 	check_index(_index, "query::value : index out of range");
-	return result[_index];
+	return table[row_pointer][_index];
 }
 
 int request::callback(int _argc,
 	char ** _argv,
 	char ** _colnames)
 {
+	row_type row;
 	for (int i = 0; i < _argc; ++i)
-		result.emplace_back(_argv[i] ? _argv[i] : "NULL");
+		row.emplace_back(_argv[i] ? _argv[i] : "NULL");
+    table.push_back(row);
 	return 0;
 }
