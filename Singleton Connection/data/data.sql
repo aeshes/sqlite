@@ -10,11 +10,11 @@ CREATE TABLE IF NOT EXISTS workers
     FOREIGN KEY(position) REFERENCES position(position_id)
 );
 
-INSERT INTO workers VALUES (NULL, 'Haruhi', 'Suzumiya', 50.49, '2017-06-14', 1);
-INSERT INTO workers VALUES (NULL, 'Asuka', 'Langley', 79.50, '2014-03-21', 1);
-INSERT INTO workers VALUES (NULL, 'Shana', 'Flame Haze', 54.19, '2013-09-17', 1);
-INSERT INTO workers VALUES (NULL, 'Shiki', 'Ryogi', 52.14, '2016-11-29', 2);
-INSERT INTO workers VALUES (NULL, 'Kirie', 'Fujou', 72.28, '2011-09-28', 3);
+INSERT INTO workers VALUES (NULL, 'Haruhi', 'Suzumiya',  50.00, '2017-06-14', 1);
+INSERT INTO workers VALUES (NULL, 'Asuka', 'Langley',    50.00, '2014-03-21', 1);
+INSERT INTO workers VALUES (NULL, 'Shana', 'Flame Haze', 50.00, '2013-09-17', 1);
+INSERT INTO workers VALUES (NULL, 'Shiki', 'Ryogi',      50.00, '2016-11-29', 2);
+INSERT INTO workers VALUES (NULL, 'Kirie', 'Fujou',      50.00, '2011-09-28', 3);
 COMMIT;
 
 BEGIN TRANSACTION;
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS subordinates
     superior INTEGER NOT NULL,
     inferior INTEGER NOT NULL,
     FOREIGN KEY(superior) REFERENCES workers(worker_id),
-	FOREIGN KEY(inferior) REFERENCES workers(worker_id)
+    FOREIGN KEY(inferior) REFERENCES workers(worker_id)
 );
 
 INSERT INTO subordinates VALUES (5, 1);
